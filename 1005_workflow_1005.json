@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "uppercase",
+        "method": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {},
+      "id": "2",
+      "name": "Convert to Uppercase",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "notes": "Takes `message` from body and uppercases it",
+      "code": "const input = $json.body.message || \"\";\nreturn [{ json: { uppercased: input.toUpperCase() } }];"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "Uppercase: {{$json.uppercased}}"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Set Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "responseMode": "lastNode"
+      },
+      "id": "4",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Convert to Uppercase", "type": "main", "index": 0 }]]
+    },
+    "Convert to Uppercase": {
+      "main": [[{ "node": "Set Response", "type": "main", "index": 0 }]]
+    },
+    "Set Response": {
+      "main": [[{ "node": "Send Response", "type": "main", "index": 0 }]]
+    }
+  },
+  "name": "Uppercase Echo Bot",
+  "active": false,
+  "version": 1
+}
